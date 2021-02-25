@@ -1,0 +1,1179 @@
+# 打印语句
+# message([SEND_ERROR | STATUS | FATAL_ERROR] message to display ...)
+# 批量指定源文件
+# file(GLOB_RECURSE pdfium_core_src ${SRC_HOME_PATH}/core/*.cpp)
+
+
+cmake_minimum_required(VERSION 3.4.1)
+
+set(SRC_HOME_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+message(STATUS src dir : ${SRC_HOME_PATH})
+
+set(CMAKE_CXX_FLAGS "   -O3 -fexceptions -DHAVE_PTHREADS -DANDROID -DOPJ_STATIC -DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_FILE -DWIN32_LEAN_AND_MEAN -DU_I18N_IMPLEMENTATION -DU_ICUDATAENTRY_IN_COMMON -DU_COMMON_IMPLEMENTATION -DU_STATIC_IMPLEMENTATION -DFT2_BUILD_LIBRARY")
+set(CMAKE_CXX_FLAGS_DEBUG "   -O3 -fexceptions -DHAVE_PTHREADS -DANDROID -DOPJ_STATIC -DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_FILE -DWIN32_LEAN_AND_MEAN -DU_I18N_IMPLEMENTATION -DU_ICUDATAENTRY_IN_COMMON -DU_COMMON_IMPLEMENTATION -DU_STATIC_IMPLEMENTATION -DFT2_BUILD_LIBRARY")
+set(CMAKE_CXX_FLAGS_RELEASE "   -O3 -fexceptions -DHAVE_PTHREADS -DANDROID -DOPJ_STATIC -DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_FILE -DWIN32_LEAN_AND_MEAN -DU_I18N_IMPLEMENTATION -DU_ICUDATAENTRY_IN_COMMON -DU_COMMON_IMPLEMENTATION -DU_STATIC_IMPLEMENTATION -DFT2_BUILD_LIBRARY")
+
+
+
+# 指定头文件目录
+include_directories (
+    ../
+    ${SRC_HOME_PATH}/../PDFIUM/
+    ${SRC_HOME_PATH}/../PDFIUM/public
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/icu/source/i18n
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/icu/source/common/
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/freetype/include/freetype/config
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/freetype/src/include
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/skia_shared/
+    ${SRC_HOME_PATH}/../PDFIUM/third_party/cpufeatures/
+    #d:/Code/NVPACK/android_sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include
+)
+
+add_library(fx_zlib STATIC
+    ../PDFIUM/third_party/zlib/adler32.c
+    ../PDFIUM/third_party/zlib/compress.c
+    ../PDFIUM/third_party/zlib/crc32.c
+    ../PDFIUM/third_party/zlib/deflate.c
+    ../PDFIUM/third_party/zlib/gzclose.c
+    ../PDFIUM/third_party/zlib/gzlib.c
+    ../PDFIUM/third_party/zlib/gzread.c
+    ../PDFIUM/third_party/zlib/gzwrite.c
+    ../PDFIUM/third_party/zlib/infback.c
+    ../PDFIUM/third_party/zlib/inffast.c
+    ../PDFIUM/third_party/zlib/inftrees.c
+    ../PDFIUM/third_party/zlib/trees.c
+    ../PDFIUM/third_party/zlib/uncompr.c
+    ../PDFIUM/third_party/zlib/zutil.c
+
+    ../PDFIUM/third_party/zlib/adler32_simd.c
+
+    ../PDFIUM/third_party/zlib/arm_features.c
+    ../PDFIUM/third_party/zlib/crc32_simd.c
+
+    ../PDFIUM/third_party/zlib/contrib/optimizations/inffast_chunk.c
+    ../PDFIUM/third_party/zlib/contrib/optimizations/inflate.c
+
+    ../PDFIUM/third_party/zlib/simd_stub.c
+)
+
+target_compile_options(
+    fx_zlib PRIVATE
+    -O3 -I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib -I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib/contrib/optimizations
+)
+
+
+add_library (fdrm STATIC
+    ../PDFIUM/core/fdrm/fx_crypt.cpp
+    ../PDFIUM/core/fdrm/fx_crypt_aes.cpp
+    ../PDFIUM/core/fdrm/fx_crypt_sha.cpp
+)
+
+add_library (fx_base STATIC
+    ../PDFIUM/third_party/base/allocator/partition_allocator/address_space_randomization.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/oom_callback.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/page_allocator.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/partition_alloc.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/partition_bucket.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/partition_oom.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/partition_page.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/partition_root_base.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/random.cc
+    ../PDFIUM/third_party/base/allocator/partition_allocator/spin_lock.cc
+    ../PDFIUM/third_party/base/debug/alias.cc
+
+    ../PDFIUM/third_party/skia_shared/SkFloatToDecimal.cpp
+
+    ../PDFIUM/fxjs/cjs_event_context_stub.cpp
+    ../PDFIUM/fxjs/cjs_runtimestub.cpp
+    ../PDFIUM/fxjs/ijs_runtime.cpp
+
+    ../PDFIUM/third_party/cpufeatures/cpu-features.c
+)
+
+add_library ( fpdfdoc STATIC
+    ../PDFIUM/core/fpdfdoc/cba_fontmap.cpp
+    ../PDFIUM/core/fpdfdoc/cline.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_aaction.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_action.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_annot.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_annotlist.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_apsettings.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_bookmark.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_bookmarktree.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_color_utils.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_defaultappearance.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_dest.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_filespec.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_formcontrol.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_formfield.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_icon.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_iconfit.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_interactiveform.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_link.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_linklist.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_metadata.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_nametree.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_numbertree.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_pagelabel.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_structelement.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_structtree.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_variabletext.cpp
+    ../PDFIUM/core/fpdfdoc/cpdf_viewerpreferences.cpp
+    ../PDFIUM/core/fpdfdoc/cpvt_fontmap.cpp
+    ../PDFIUM/core/fpdfdoc/cpvt_generateap.cpp
+    ../PDFIUM/core/fpdfdoc/cpvt_wordinfo.cpp
+    ../PDFIUM/core/fpdfdoc/csection.cpp
+    ../PDFIUM/core/fpdfdoc/ctypeset.cpp
+)
+
+
+add_library ( fpdfapi STATIC
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/Adobe-CNS1-UCS2_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/B5pc-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/B5pc-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/CNS-EUC-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/CNS-EUC-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/ETen-B5-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/ETen-B5-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/ETenms-B5-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/ETenms-B5-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/HKscs-B5-H_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/HKscs-B5-V_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/UniCNS-UCS2-H_3.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/UniCNS-UCS2-V_3.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/UniCNS-UTF16-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/CNS1/cmaps_cns1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/Adobe-GB1-UCS2_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GB-EUC-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GB-EUC-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBK-EUC-H_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBK-EUC-V_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBK2K-H_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBK2K-V_5.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBKp-EUC-H_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBKp-EUC-V_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBpc-EUC-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/GBpc-EUC-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/UniGB-UCS2-H_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/UniGB-UCS2-V_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/GB1/cmaps_gb1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/83pv-RKSJ-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/90ms-RKSJ-H_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/90ms-RKSJ-V_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/90msp-RKSJ-H_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/90msp-RKSJ-V_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/90pv-RKSJ-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/Add-RKSJ-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/Add-RKSJ-V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/Adobe-Japan1-UCS2_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/EUC-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/EUC-V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/Ext-RKSJ-H_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/Ext-RKSJ-V_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/UniJIS-UCS2-HW-H_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/UniJIS-UCS2-HW-V_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/UniJIS-UCS2-H_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/UniJIS-UCS2-V_4.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Japan1/cmaps_japan1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/Adobe-Korea1-UCS2_2.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSC-EUC-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSC-EUC-V_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSCms-UHC-HW-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSCms-UHC-HW-V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSCms-UHC-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSCms-UHC-V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/KSCpc-EUC-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/UniKS-UCS2-H_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/UniKS-UCS2-V_1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/UniKS-UTF16-H_0.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/Korea1/cmaps_korea1.cpp
+    ../PDFIUM/core/fpdfapi/cmaps/fpdf_cmaps.cpp
+
+    ../PDFIUM/core/fpdfapi/edit/cpdf_contentstream_write_utils.cpp
+    ../PDFIUM/core/fpdfapi/edit/cpdf_creator.cpp
+    ../PDFIUM/core/fpdfapi/edit/cpdf_pagecontentgenerator.cpp
+    ../PDFIUM/core/fpdfapi/edit/cpdf_pagecontentmanager.cpp
+    ../PDFIUM/core/fpdfapi/edit/cpdf_stringarchivestream.cpp
+
+    ../PDFIUM/core/fpdfapi/font/cfx_cttgsubtable.cpp
+    ../PDFIUM/core/fpdfapi/font/cfx_stockfontarray.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_cid2unicodemap.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_cidfont.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_cmap.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_cmapmanager.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_cmapparser.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_font.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_fontencoding.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_fontglobals.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_simplefont.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_tounicodemap.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_truetypefont.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_type1font.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_type3char.cpp
+    ../PDFIUM/core/fpdfapi/font/cpdf_type3font.cpp
+
+    ../PDFIUM/core/fpdfapi/page/cpdf_allstates.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_annotcontext.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_clippath.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_color.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_colorspace.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_colorstate.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_contentmarkitem.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_contentmarks.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_contentparser.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_devicecs.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_dib.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_docpagedata.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_expintfunc.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_form.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_formobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_function.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_generalstate.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_graphicstates.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_iccprofile.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_image.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_imageobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_meshstream.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_occontext.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_page.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_pagemodule.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_pageobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_pageobjectholder.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_path.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_pathobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_pattern.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_patterncs.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_psengine.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_psfunc.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_sampledfunc.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_shadingobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_shadingpattern.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_stitchfunc.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_streamcontentparser.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_streamparser.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_textobject.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_textstate.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_tilingpattern.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_transferfunc.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_transferfuncdib.cpp
+    ../PDFIUM/core/fpdfapi/page/cpdf_transparency.cpp
+
+    ../PDFIUM/core/fpdfapi/parser/cfdf_document.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_array.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_boolean.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_cross_ref_avail.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_cross_ref_table.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_crypto_handler.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_data_avail.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_dictionary.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_document.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_encryptor.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_flateencoder.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_hint_tables.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_indirect_object_holder.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_linearized_header.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_name.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_null.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_number.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_object.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_object_avail.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_object_stream.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_object_walker.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_page_object_avail.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_parser.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_read_validator.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_reference.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_security_handler.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_simple_parser.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_stream.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_stream_acc.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_string.cpp
+    ../PDFIUM/core/fpdfapi/parser/cpdf_syntax_parser.cpp
+    ../PDFIUM/core/fpdfapi/parser/fpdf_parser_decode.cpp
+    ../PDFIUM/core/fpdfapi/parser/fpdf_parser_utility.cpp
+
+    ../PDFIUM/core/fpdfapi/render/cpdf_charposlist.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_devicebuffer.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_docrenderdata.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_imagecacheentry.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_imageloader.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_imagerenderer.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_pagerendercache.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_pagerendercontext.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_progressiverenderer.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_rendercontext.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_renderoptions.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_rendershading.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_renderstatus.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_scaledrenderbuffer.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_textrenderer.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_type3cache.cpp
+    ../PDFIUM/core/fpdfapi/render/cpdf_type3glyphmap.cpp
+)
+
+add_library(fpdftext STATIC
+    ../PDFIUM/core/fpdftext/cpdf_linkextract.cpp
+    ../PDFIUM/core/fpdftext/cpdf_textpage.cpp
+    ../PDFIUM/core/fpdftext/cpdf_textpagefind.cpp
+    ../PDFIUM/core/fpdftext/unicodenormalizationdata.cpp
+)
+
+
+add_library(libjpeg STATIC
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcapimin.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcapistd.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jccoefct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jccolor.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcdctmgr.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jchuff.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcinit.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcmainct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcmarker.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcmaster.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcomapi.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcparam.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcphuff.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcprepct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jcsample.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jctrans.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdapimin.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdapistd.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdcoefct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdcolor.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jddctmgr.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdhuff.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdinput.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdmainct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdmarker.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdmaster.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdmerge.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdphuff.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdpostct.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdsample.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jdtrans.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jerror.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jfdctfst.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jfdctint.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jidctfst.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jidctint.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jidctred.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jmemmgr.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jmemnobs.c
+    ../PDFIUM/third_party/libjpeg/fpdfapi_jutils.c
+)
+
+target_compile_options(
+    libjpeg PRIVATE
+    -D_FX_OS_=1
+)
+
+add_library(fx_lcms2 STATIC
+    ../PDFIUM/third_party/lcms/src/cmsalpha.c
+    ../PDFIUM/third_party/lcms/src/cmscam02.c
+    ../PDFIUM/third_party/lcms/src/cmscgats.c
+    ../PDFIUM/third_party/lcms/src/cmscnvrt.c
+    ../PDFIUM/third_party/lcms/src/cmserr.c
+    ../PDFIUM/third_party/lcms/src/cmsgamma.c
+    ../PDFIUM/third_party/lcms/src/cmsgmt.c
+    ../PDFIUM/third_party/lcms/src/cmshalf.c
+    ../PDFIUM/third_party/lcms/src/cmsintrp.c
+    ../PDFIUM/third_party/lcms/src/cmsio0.c
+    ../PDFIUM/third_party/lcms/src/cmsio1.c
+    ../PDFIUM/third_party/lcms/src/cmslut.c
+    ../PDFIUM/third_party/lcms/src/cmsmd5.c
+    ../PDFIUM/third_party/lcms/src/cmsmtrx.c
+    ../PDFIUM/third_party/lcms/src/cmsnamed.c
+    ../PDFIUM/third_party/lcms/src/cmsopt.c
+    ../PDFIUM/third_party/lcms/src/cmspack.c
+    ../PDFIUM/third_party/lcms/src/cmspcs.c
+    ../PDFIUM/third_party/lcms/src/cmsplugin.c
+    ../PDFIUM/third_party/lcms/src/cmsps2.c
+    ../PDFIUM/third_party/lcms/src/cmssamp.c
+    ../PDFIUM/third_party/lcms/src/cmssm.c
+    ../PDFIUM/third_party/lcms/src/cmstypes.c
+    ../PDFIUM/third_party/lcms/src/cmsvirt.c
+    ../PDFIUM/third_party/lcms/src/cmswtpnt.c
+    ../PDFIUM/third_party/lcms/src/cmsxform.c
+)
+
+
+add_library(fx_libopenjpeg STATIC
+    ../PDFIUM/third_party/libopenjpeg20/bio.c
+    ../PDFIUM/third_party/libopenjpeg20/cio.c
+    ../PDFIUM/third_party/libopenjpeg20/dwt.c
+    ../PDFIUM/third_party/libopenjpeg20/event.c
+    ../PDFIUM/third_party/libopenjpeg20/function_list.c
+    ../PDFIUM/third_party/libopenjpeg20/image.c
+    ../PDFIUM/third_party/libopenjpeg20/invert.c
+    ../PDFIUM/third_party/libopenjpeg20/j2k.c
+    ../PDFIUM/third_party/libopenjpeg20/jp2.c
+    ../PDFIUM/third_party/libopenjpeg20/mct.c
+    ../PDFIUM/third_party/libopenjpeg20/mqc.c
+    ../PDFIUM/third_party/libopenjpeg20/openjpeg.c
+    ../PDFIUM/third_party/libopenjpeg20/opj_clock.c
+    ../PDFIUM/third_party/libopenjpeg20/pi.c
+    ../PDFIUM/third_party/libopenjpeg20/sparse_array.c
+    ../PDFIUM/third_party/libopenjpeg20/t1.c
+    ../PDFIUM/third_party/libopenjpeg20/t2.c
+    ../PDFIUM/third_party/libopenjpeg20/tcd.c
+    ../PDFIUM/third_party/libopenjpeg20/tgt.c
+    ../PDFIUM/third_party/libopenjpeg20/thread.c
+)
+
+# INFLATE_CHUNK_SIMD_NEON:  only used for arm
+# ARMV8_OS_ANDROID:  arm64
+# INFLATE_CHUNK_SIMD_NEON
+target_compile_options(
+    fx_zlib PRIVATE
+    -O3 -Wno-shift-negative-value -Wno-unused-parameter -DADLER32_SIMD_NEON -DARMV8_OS_ANDROID -DINFLATE_CHUNK_SIMD_NEON -DINFLATE_CHUNK_READ_64LE
+)
+
+add_library(fx_agg32 STATIC
+    ../PDFIUM/third_party/agg23/agg_curves.cpp
+    ../PDFIUM/third_party/agg23/agg_path_storage.cpp
+    ../PDFIUM/third_party/agg23/agg_rasterizer_scanline_aa.cpp
+    ../PDFIUM/third_party/agg23/agg_vcgen_dash.cpp
+    ../PDFIUM/third_party/agg23/agg_vcgen_stroke.cpp
+)
+
+
+add_library(fxcodec STATIC
+    ../PDFIUM/core/fxcodec/basic/basicmodule.cpp
+    ../PDFIUM/core/fxcodec/cfx_codec_memory.cpp
+    ../PDFIUM/core/fxcodec/fax/faxmodule.cpp
+    ../PDFIUM/core/fxcodec/flate/flatemodule.cpp
+    ../PDFIUM/core/fxcodec/fx_codec.cpp
+    ../PDFIUM/core/fxcodec/icc/iccmodule.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_ArithDecoder.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_ArithIntDecoder.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_BitStream.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_Context.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_DocumentContext.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_GrdProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_GrrdProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_HtrdProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_HuffmanDecoder.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_HuffmanTable.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_Image.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_PatternDict.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_PddProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_SddProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_Segment.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_SymbolDict.cpp
+    ../PDFIUM/core/fxcodec/jbig2/JBig2_TrdProc.cpp
+    ../PDFIUM/core/fxcodec/jbig2/jbig2module.cpp
+    ../PDFIUM/core/fxcodec/jpeg/jpegmodule.cpp
+    ../PDFIUM/core/fxcodec/jpx/cjpx_decoder.cpp
+    ../PDFIUM/core/fxcodec/jpx/jpx_decode_utils.cpp
+    ../PDFIUM/core/fxcodec/jpx/jpxmodule.cpp
+    ../PDFIUM/core/fxcodec/scanlinedecoder.cpp
+)
+
+target_compile_options(
+    fxcodec PRIVATE
+    -O3 -D_FX_OS_=1
+)
+
+add_library(fxcrt STATIC
+    ../PDFIUM/core/fxcrt/bytestring.cpp
+    ../PDFIUM/core/fxcrt/cfx_binarybuf.cpp
+    ../PDFIUM/core/fxcrt/cfx_bitstream.cpp
+    ../PDFIUM/core/fxcrt/cfx_datetime.cpp
+    ../PDFIUM/core/fxcrt/cfx_readonlymemorystream.cpp
+    ../PDFIUM/core/fxcrt/cfx_seekablestreamproxy.cpp
+    ../PDFIUM/core/fxcrt/cfx_timer.cpp
+    ../PDFIUM/core/fxcrt/cfx_utf8decoder.cpp
+    ../PDFIUM/core/fxcrt/cfx_utf8encoder.cpp
+    ../PDFIUM/core/fxcrt/cfx_widetextbuf.cpp
+    ../PDFIUM/core/fxcrt/fx_bidi.cpp
+    ../PDFIUM/core/fxcrt/fx_codepage.cpp
+    ../PDFIUM/core/fxcrt/fx_coordinates.cpp
+    ../PDFIUM/core/fxcrt/fx_extension.cpp
+    ../PDFIUM/core/fxcrt/fx_memory.cpp
+    ../PDFIUM/core/fxcrt/fx_number.cpp
+    ../PDFIUM/core/fxcrt/fx_random.cpp
+    ../PDFIUM/core/fxcrt/fx_stream.cpp
+    ../PDFIUM/core/fxcrt/fx_string.cpp
+    ../PDFIUM/core/fxcrt/fx_system.cpp
+    ../PDFIUM/core/fxcrt/fx_unicode.cpp
+    ../PDFIUM/core/fxcrt/observed_ptr.cpp
+    ../PDFIUM/core/fxcrt/widestring.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmlchardata.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmldocument.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmlelement.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmlinstruction.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmlnode.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmlparser.cpp
+    ../PDFIUM/core/fxcrt/xml/cfx_xmltext.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csscolorvalue.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csscomputedstyle.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csscustomproperty.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssdata.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssdeclaration.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssenumvalue.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssexttextbuf.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssnumbervalue.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csspropertyholder.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssrulecollection.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssselector.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssstringvalue.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssstylerule.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssstyleselector.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssstylesheet.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csssyntaxparser.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_csstextbuf.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssvalue.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssvaluelist.cpp
+    ../PDFIUM/core/fxcrt/css/cfx_cssvaluelistparser.cpp
+    ../PDFIUM/core/fxcrt/cfx_fileaccess_posix.cpp
+)
+
+
+add_library(fxge STATIC
+    ../PDFIUM/core/fxge/cfx_cliprgn.cpp
+    ../PDFIUM/core/fxge/cfx_color.cpp
+    ../PDFIUM/core/fxge/cfx_face.cpp
+    ../PDFIUM/core/fxge/cfx_folderfontinfo.cpp
+    ../PDFIUM/core/fxge/cfx_font.cpp
+    ../PDFIUM/core/fxge/cfx_fontcache.cpp
+    ../PDFIUM/core/fxge/cfx_fontmapper.cpp
+    ../PDFIUM/core/fxge/cfx_fontmgr.cpp
+    ../PDFIUM/core/fxge/cfx_gemodule.cpp
+    ../PDFIUM/core/fxge/cfx_glyphbitmap.cpp
+    ../PDFIUM/core/fxge/cfx_glyphcache.cpp
+    ../PDFIUM/core/fxge/cfx_graphstate.cpp
+    ../PDFIUM/core/fxge/cfx_graphstatedata.cpp
+    ../PDFIUM/core/fxge/cfx_pathdata.cpp
+    ../PDFIUM/core/fxge/cfx_renderdevice.cpp
+    ../PDFIUM/core/fxge/cfx_substfont.cpp
+    ../PDFIUM/core/fxge/cfx_unicodeencoding.cpp
+    ../PDFIUM/core/fxge/dib/cfx_bitmapcomposer.cpp
+    ../PDFIUM/core/fxge/dib/cfx_bitmapstorer.cpp
+    ../PDFIUM/core/fxge/dib/cfx_cmyk_to_srgb.cpp
+    ../PDFIUM/core/fxge/dib/cfx_dibbase.cpp
+    ../PDFIUM/core/fxge/dib/cfx_dibitmap.cpp
+    ../PDFIUM/core/fxge/dib/cfx_imagerenderer.cpp
+    ../PDFIUM/core/fxge/dib/cfx_imagestretcher.cpp
+    ../PDFIUM/core/fxge/dib/cfx_imagetransformer.cpp
+    ../PDFIUM/core/fxge/dib/cfx_scanlinecompositor.cpp
+    ../PDFIUM/core/fxge/dib/cstretchengine.cpp
+    ../PDFIUM/core/fxge/dib/fx_dib_main.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitDingbats.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitFixed.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitFixedBold.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitFixedBoldItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitFixedItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSans.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSansBold.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSansBoldItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSansItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSansMM.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSerif.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSerifBold.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSerifBoldItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSerifItalic.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSerifMM.cpp
+    ../PDFIUM/core/fxge/fontdata/chromefontdata/FoxitSymbol.cpp
+    ../PDFIUM/core/fxge/freetype/fx_freetype.cpp
+    ../PDFIUM/core/fxge/fx_font.cpp
+    ../PDFIUM/core/fxge/fx_ge_fontmap.cpp
+    ../PDFIUM/core/fxge/renderdevicedriver_iface.cpp
+    ../PDFIUM/core/fxge/scoped_font_transform.cpp
+    ../PDFIUM/core/fxge/text_char_pos.cpp
+    ../PDFIUM/core/fxge/text_glyph_pos.cpp
+
+    ../PDFIUM/core/fxge/android/cfpf_skiadevicemodule.cpp
+    ../PDFIUM/core/fxge/android/cfpf_skiafont.cpp
+    ../PDFIUM/core/fxge/android/cfpf_skiafontmgr.cpp
+    ../PDFIUM/core/fxge/android/cfpf_skiapathfont.cpp
+    ../PDFIUM/core/fxge/android/cfx_androidfontinfo.cpp
+    ../PDFIUM/core/fxge/android/fx_android_imp.cpp
+
+    ../PDFIUM/core/fxge/agg/fx_agg_driver.cpp
+)
+
+# file(GLOB_RECURSE freetype_src ${SRC_HOME_PATH}/third_party/freetype/src/*.c)
+add_library(fx_freetype STATIC
+    ../PDFIUM/third_party/freetype/src/src/base/ftbase.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftbitmap.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftdebug.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftglyph.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftinit.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftmm.c
+    ../PDFIUM/third_party/freetype/src/src/base/ftsystem.c
+    ../PDFIUM/third_party/freetype/src/src/cff/cff.c
+    ../PDFIUM/third_party/freetype/src/src/cid/type1cid.c
+    ../PDFIUM/third_party/freetype/src/src/psaux/psaux.c
+    ../PDFIUM/third_party/freetype/src/src/pshinter/pshinter.c
+    ../PDFIUM/third_party/freetype/src/src/psnames/psmodule.c
+    ../PDFIUM/third_party/freetype/src/src/raster/raster.c
+    ../PDFIUM/third_party/freetype/src/src/sfnt/sfnt.c
+    ../PDFIUM/third_party/freetype/src/src/smooth/smooth.c
+    ../PDFIUM/third_party/freetype/src/src/truetype/truetype.c
+    ../PDFIUM/third_party/freetype/src/src/type1/type1.c
+    ../PDFIUM/third_party/freetype/src/src/gzip/ftgzip.c
+)
+
+target_compile_options(
+    fx_freetype PRIVATE
+    -O3 -DFT2_BUILD_LIBRARY
+)
+
+add_library(fx_icu STATIC
+    ../PDFIUM/third_party/icu/source/i18n/alphaindex.cpp
+    ../PDFIUM/third_party/icu/source/i18n/anytrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/astro.cpp
+    ../PDFIUM/third_party/icu/source/i18n/basictz.cpp
+    ../PDFIUM/third_party/icu/source/i18n/bocsu.cpp
+    ../PDFIUM/third_party/icu/source/i18n/brktrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/buddhcal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/calendar.cpp
+    ../PDFIUM/third_party/icu/source/i18n/casetrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/cecal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/chnsecal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/choicfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/coleitr.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationbuilder.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationcompare.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collation.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationdatabuilder.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationdata.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationdatareader.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationdatawriter.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationfastlatinbuilder.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationfastlatin.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationfcd.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationiterator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationkeys.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationroot.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationrootelements.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationruleparser.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationsets.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationsettings.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationtailoring.cpp
+    ../PDFIUM/third_party/icu/source/i18n/collationweights.cpp
+    ../PDFIUM/third_party/icu/source/i18n/coll.cpp
+    ../PDFIUM/third_party/icu/source/i18n/compactdecimalformat.cpp
+    ../PDFIUM/third_party/icu/source/i18n/coptccal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/cpdtrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csdetect.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csmatch.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csr2022.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csrecog.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csrmbcs.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csrsbcs.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csrucode.cpp
+    ../PDFIUM/third_party/icu/source/i18n/csrutf8.cpp
+    ../PDFIUM/third_party/icu/source/i18n/curramt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/currfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/currpinf.cpp
+    ../PDFIUM/third_party/icu/source/i18n/currunit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dangical.cpp
+    ../PDFIUM/third_party/icu/source/i18n/datefmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dayperiodrules.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dcfmtsym.cpp
+    ../PDFIUM/third_party/icu/source/i18n/decContext.cpp
+    ../PDFIUM/third_party/icu/source/i18n/decimfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/decNumber.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-bignum.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-bignum-dtoa.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-cached-powers.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-double-to-string.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-fast-dtoa.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-string-to-double.cpp
+    ../PDFIUM/third_party/icu/source/i18n/double-conversion-strtod.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dtfmtsym.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dtitvfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dtitvinf.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dtptngen.cpp
+    ../PDFIUM/third_party/icu/source/i18n/dtrule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/erarules.cpp
+    ../PDFIUM/third_party/icu/source/i18n/esctrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ethpccal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/fmtable_cnv.cpp
+    ../PDFIUM/third_party/icu/source/i18n/fmtable.cpp
+    ../PDFIUM/third_party/icu/source/i18n/format.cpp
+    ../PDFIUM/third_party/icu/source/i18n/formatted_string_builder.cpp
+    ../PDFIUM/third_party/icu/source/i18n/formattedval_iterimpl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/formattedval_sbimpl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/formattedvalue.cpp
+    ../PDFIUM/third_party/icu/source/i18n/fphdlimp.cpp
+    ../PDFIUM/third_party/icu/source/i18n/fpositer.cpp
+    ../PDFIUM/third_party/icu/source/i18n/funcrepl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/gender.cpp
+    ../PDFIUM/third_party/icu/source/i18n/gregocal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/gregoimp.cpp
+    ../PDFIUM/third_party/icu/source/i18n/hebrwcal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/indiancal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/inputext.cpp
+    ../PDFIUM/third_party/icu/source/i18n/islamcal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/japancal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/listformatter.cpp
+    ../PDFIUM/third_party/icu/source/i18n/measfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/measunit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/measure.cpp
+    ../PDFIUM/third_party/icu/source/i18n/msgfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/name2uni.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nfrs.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nfrule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nfsubs.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nortrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nounit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/nultrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_affixutils.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_asformat.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_capi.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_compact.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_currencysymbols.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_decimalquantity.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_decimfmtprops.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_fluent.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_formatimpl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_grouping.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_integerwidth.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_longnames.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_mapper.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_modifiers.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_multiplier.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_notation.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_output.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_padding.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_patternmodifier.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_patternstring.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_rounding.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_scientific.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_skeletons.cpp
+    ../PDFIUM/third_party/icu/source/i18n/number_utils.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_affixes.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_compositions.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_currency.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_decimal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_impl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_parsednumber.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_scientific.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_symbols.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numparse_validators.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numrange_fluent.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numrange_impl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/numsys.cpp
+    ../PDFIUM/third_party/icu/source/i18n/olsontz.cpp
+    ../PDFIUM/third_party/icu/source/i18n/persncal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/plurfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/plurrule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/quant.cpp
+    ../PDFIUM/third_party/icu/source/i18n/quantityformatter.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbnf.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbt_data.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbt_pars.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbt_rule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbt_set.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rbtz.cpp
+    ../PDFIUM/third_party/icu/source/i18n/regexcmp.cpp
+    ../PDFIUM/third_party/icu/source/i18n/regeximp.cpp
+    ../PDFIUM/third_party/icu/source/i18n/regexst.cpp
+    ../PDFIUM/third_party/icu/source/i18n/regextxt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/region.cpp
+    ../PDFIUM/third_party/icu/source/i18n/reldatefmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/reldtfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rematch.cpp
+    ../PDFIUM/third_party/icu/source/i18n/remtrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/repattrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/rulebasedcollator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/scientificnumberformatter.cpp
+    ../PDFIUM/third_party/icu/source/i18n/scriptset.cpp
+    ../PDFIUM/third_party/icu/source/i18n/search.cpp
+    ../PDFIUM/third_party/icu/source/i18n/selfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/sharedbreakiterator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/simpletz.cpp
+    ../PDFIUM/third_party/icu/source/i18n/smpdtfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/smpdtfst.cpp
+    ../PDFIUM/third_party/icu/source/i18n/sortkey.cpp
+    ../PDFIUM/third_party/icu/source/i18n/standardplural.cpp
+    ../PDFIUM/third_party/icu/source/i18n/string_segment.cpp
+    ../PDFIUM/third_party/icu/source/i18n/strmatch.cpp
+    ../PDFIUM/third_party/icu/source/i18n/strrepl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/stsearch.cpp
+    ../PDFIUM/third_party/icu/source/i18n/taiwncal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/timezone.cpp
+    ../PDFIUM/third_party/icu/source/i18n/titletrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tmunit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tmutamt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tmutfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tolowtrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/toupptrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/translit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/transreg.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tridpars.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tzfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tzgnames.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tznames.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tznames_impl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tzrule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/tztrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucal.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucln_in.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucol.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucoleitr.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucol_res.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucol_sit.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ucsdet.cpp
+    ../PDFIUM/third_party/icu/source/i18n/udat.cpp
+    ../PDFIUM/third_party/icu/source/i18n/udateintervalformat.cpp
+    ../PDFIUM/third_party/icu/source/i18n/udatpg.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ufieldpositer.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uitercollationiterator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ulistformatter.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ulocdata.cpp
+    ../PDFIUM/third_party/icu/source/i18n/umsg.cpp
+    ../PDFIUM/third_party/icu/source/i18n/unesctrn.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uni2name.cpp
+    ../PDFIUM/third_party/icu/source/i18n/unum.cpp
+    ../PDFIUM/third_party/icu/source/i18n/unumsys.cpp
+    ../PDFIUM/third_party/icu/source/i18n/upluralrules.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uregexc.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uregex.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uregion.cpp
+    ../PDFIUM/third_party/icu/source/i18n/usearch.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uspoof_build.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uspoof_conf.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uspoof.cpp
+    ../PDFIUM/third_party/icu/source/i18n/uspoof_impl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/utf16collationiterator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/utf8collationiterator.cpp
+    ../PDFIUM/third_party/icu/source/i18n/utmscale.cpp
+    ../PDFIUM/third_party/icu/source/i18n/utrans.cpp
+    ../PDFIUM/third_party/icu/source/i18n/vtzone.cpp
+    ../PDFIUM/third_party/icu/source/i18n/vzone.cpp
+    ../PDFIUM/third_party/icu/source/i18n/windtfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/winnmfmt.cpp
+    ../PDFIUM/third_party/icu/source/i18n/wintzimpl.cpp
+    ../PDFIUM/third_party/icu/source/i18n/zonemeta.cpp
+    ../PDFIUM/third_party/icu/source/i18n/zrule.cpp
+    ../PDFIUM/third_party/icu/source/i18n/ztrans.cpp
+
+
+    ../PDFIUM/third_party/icu/source/common/appendable.cpp
+    ../PDFIUM/third_party/icu/source/common/bmpset.cpp
+    ../PDFIUM/third_party/icu/source/common/brkeng.cpp
+    ../PDFIUM/third_party/icu/source/common/brkiter.cpp
+    ../PDFIUM/third_party/icu/source/common/bytesinkutil.cpp
+    ../PDFIUM/third_party/icu/source/common/bytestream.cpp
+    ../PDFIUM/third_party/icu/source/common/bytestriebuilder.cpp
+    ../PDFIUM/third_party/icu/source/common/bytestrie.cpp
+    ../PDFIUM/third_party/icu/source/common/bytestrieiterator.cpp
+    ../PDFIUM/third_party/icu/source/common/caniter.cpp
+    ../PDFIUM/third_party/icu/source/common/characterproperties.cpp
+    ../PDFIUM/third_party/icu/source/common/chariter.cpp
+    ../PDFIUM/third_party/icu/source/common/charstr.cpp
+    ../PDFIUM/third_party/icu/source/common/cmemory.cpp
+    ../PDFIUM/third_party/icu/source/common/cstr.cpp
+    ../PDFIUM/third_party/icu/source/common/cstring.cpp
+    ../PDFIUM/third_party/icu/source/common/cwchar.cpp
+    ../PDFIUM/third_party/icu/source/common/dictbe.cpp
+    ../PDFIUM/third_party/icu/source/common/dictionarydata.cpp
+    ../PDFIUM/third_party/icu/source/common/dtintrv.cpp
+    ../PDFIUM/third_party/icu/source/common/edits.cpp
+    ../PDFIUM/third_party/icu/source/common/errorcode.cpp
+    ../PDFIUM/third_party/icu/source/common/filteredbrk.cpp
+    ../PDFIUM/third_party/icu/source/common/filterednormalizer2.cpp
+    ../PDFIUM/third_party/icu/source/common/icudataver.cpp
+    ../PDFIUM/third_party/icu/source/common/icuplug.cpp
+    ../PDFIUM/third_party/icu/source/common/loadednormalizer2impl.cpp
+    ../PDFIUM/third_party/icu/source/common/localebuilder.cpp
+    ../PDFIUM/third_party/icu/source/common/localematcher.cpp
+    ../PDFIUM/third_party/icu/source/common/localeprioritylist.cpp
+    ../PDFIUM/third_party/icu/source/common/locavailable.cpp
+    ../PDFIUM/third_party/icu/source/common/locbased.cpp
+    ../PDFIUM/third_party/icu/source/common/locdispnames.cpp
+    ../PDFIUM/third_party/icu/source/common/locdistance.cpp
+    ../PDFIUM/third_party/icu/source/common/locdspnm.cpp
+    ../PDFIUM/third_party/icu/source/common/locid.cpp
+    ../PDFIUM/third_party/icu/source/common/loclikely.cpp
+    ../PDFIUM/third_party/icu/source/common/loclikelysubtags.cpp
+    ../PDFIUM/third_party/icu/source/common/locmap.cpp
+    ../PDFIUM/third_party/icu/source/common/locresdata.cpp
+    ../PDFIUM/third_party/icu/source/common/locutil.cpp
+    ../PDFIUM/third_party/icu/source/common/lsr.cpp
+    ../PDFIUM/third_party/icu/source/common/messagepattern.cpp
+    ../PDFIUM/third_party/icu/source/common/normalizer2.cpp
+    ../PDFIUM/third_party/icu/source/common/normalizer2impl.cpp
+    ../PDFIUM/third_party/icu/source/common/normlzr.cpp
+    ../PDFIUM/third_party/icu/source/common/parsepos.cpp
+    ../PDFIUM/third_party/icu/source/common/patternprops.cpp
+    ../PDFIUM/third_party/icu/source/common/pluralmap.cpp
+    ../PDFIUM/third_party/icu/source/common/propname.cpp
+    ../PDFIUM/third_party/icu/source/common/propsvec.cpp
+    ../PDFIUM/third_party/icu/source/common/punycode.cpp
+    ../PDFIUM/third_party/icu/source/common/putil.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbi_cache.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbi.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbidata.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbinode.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbirb.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbiscan.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbisetb.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbistbl.cpp
+    ../PDFIUM/third_party/icu/source/common/rbbitblb.cpp
+    ../PDFIUM/third_party/icu/source/common/resbund_cnv.cpp
+    ../PDFIUM/third_party/icu/source/common/resbund.cpp
+    ../PDFIUM/third_party/icu/source/common/resource.cpp
+    ../PDFIUM/third_party/icu/source/common/restrace.cpp
+    ../PDFIUM/third_party/icu/source/common/ruleiter.cpp
+    ../PDFIUM/third_party/icu/source/common/schriter.cpp
+    ../PDFIUM/third_party/icu/source/common/serv.cpp
+    ../PDFIUM/third_party/icu/source/common/servlk.cpp
+    ../PDFIUM/third_party/icu/source/common/servlkf.cpp
+    ../PDFIUM/third_party/icu/source/common/servls.cpp
+    ../PDFIUM/third_party/icu/source/common/servnotf.cpp
+    ../PDFIUM/third_party/icu/source/common/servrbf.cpp
+    ../PDFIUM/third_party/icu/source/common/servslkf.cpp
+    ../PDFIUM/third_party/icu/source/common/sharedobject.cpp
+    ../PDFIUM/third_party/icu/source/common/simpleformatter.cpp
+    ../PDFIUM/third_party/icu/source/common/static_unicode_sets.cpp
+    ../PDFIUM/third_party/icu/source/common/stringpiece.cpp
+    ../PDFIUM/third_party/icu/source/common/stringtriebuilder.cpp
+    ../PDFIUM/third_party/icu/source/common/uarrsort.cpp
+    ../PDFIUM/third_party/icu/source/common/ubidi.cpp
+    ../PDFIUM/third_party/icu/source/common/ubidiln.cpp
+    ../PDFIUM/third_party/icu/source/common/ubidi_props.cpp
+    ../PDFIUM/third_party/icu/source/common/ubiditransform.cpp
+    ../PDFIUM/third_party/icu/source/common/ubidiwrt.cpp
+    ../PDFIUM/third_party/icu/source/common/ubrk.cpp
+    ../PDFIUM/third_party/icu/source/common/ucase.cpp
+    ../PDFIUM/third_party/icu/source/common/ucasemap.cpp
+    ../PDFIUM/third_party/icu/source/common/ucasemap_titlecase_brkiter.cpp
+    ../PDFIUM/third_party/icu/source/common/ucat.cpp
+    ../PDFIUM/third_party/icu/source/common/uchar.cpp
+    ../PDFIUM/third_party/icu/source/common/ucharstriebuilder.cpp
+    ../PDFIUM/third_party/icu/source/common/ucharstrie.cpp
+    ../PDFIUM/third_party/icu/source/common/ucharstrieiterator.cpp
+    ../PDFIUM/third_party/icu/source/common/uchriter.cpp
+    ../PDFIUM/third_party/icu/source/common/ucln_cmn.cpp
+    ../PDFIUM/third_party/icu/source/common/ucmndata.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv2022.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_bld.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvbocu.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_cb.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_cnv.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_ct.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvdisp.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_err.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_ext.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvhz.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_io.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvisci.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvlat1.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_lmb.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvmbcs.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvscsu.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnvsel.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_set.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_u16.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_u32.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_u7.cpp
+    ../PDFIUM/third_party/icu/source/common/ucnv_u8.cpp
+    ../PDFIUM/third_party/icu/source/common/ucol_swp.cpp
+    ../PDFIUM/third_party/icu/source/common/ucptrie.cpp
+    ../PDFIUM/third_party/icu/source/common/ucurr.cpp
+    ../PDFIUM/third_party/icu/source/common/udata.cpp
+    ../PDFIUM/third_party/icu/source/common/udatamem.cpp
+    ../PDFIUM/third_party/icu/source/common/udataswp.cpp
+    ../PDFIUM/third_party/icu/source/common/uenum.cpp
+    ../PDFIUM/third_party/icu/source/common/uhash.cpp
+    ../PDFIUM/third_party/icu/source/common/uhash_us.cpp
+    ../PDFIUM/third_party/icu/source/common/uidna.cpp
+    ../PDFIUM/third_party/icu/source/common/uinit.cpp
+    ../PDFIUM/third_party/icu/source/common/uinvchar.cpp
+    ../PDFIUM/third_party/icu/source/common/uiter.cpp
+    ../PDFIUM/third_party/icu/source/common/ulist.cpp
+    ../PDFIUM/third_party/icu/source/common/uloc.cpp
+    ../PDFIUM/third_party/icu/source/common/uloc_keytype.cpp
+    ../PDFIUM/third_party/icu/source/common/uloc_tag.cpp
+    ../PDFIUM/third_party/icu/source/common/umapfile.cpp
+    ../PDFIUM/third_party/icu/source/common/umath.cpp
+    ../PDFIUM/third_party/icu/source/common/umutablecptrie.cpp
+    ../PDFIUM/third_party/icu/source/common/umutex.cpp
+    ../PDFIUM/third_party/icu/source/common/unames.cpp
+    ../PDFIUM/third_party/icu/source/common/unifiedcache.cpp
+    ../PDFIUM/third_party/icu/source/common/unifilt.cpp
+    ../PDFIUM/third_party/icu/source/common/unifunct.cpp
+    ../PDFIUM/third_party/icu/source/common/uniset_closure.cpp
+    ../PDFIUM/third_party/icu/source/common/uniset.cpp
+    ../PDFIUM/third_party/icu/source/common/uniset_props.cpp
+    ../PDFIUM/third_party/icu/source/common/unisetspan.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr_case.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr_case_locale.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr_cnv.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr_props.cpp
+    ../PDFIUM/third_party/icu/source/common/unistr_titlecase_brkiter.cpp
+    ../PDFIUM/third_party/icu/source/common/unormcmp.cpp
+    ../PDFIUM/third_party/icu/source/common/unorm.cpp
+    ../PDFIUM/third_party/icu/source/common/uobject.cpp
+    ../PDFIUM/third_party/icu/source/common/uprops.cpp
+    ../PDFIUM/third_party/icu/source/common/uresbund.cpp
+    ../PDFIUM/third_party/icu/source/common/ures_cnv.cpp
+    ../PDFIUM/third_party/icu/source/common/uresdata.cpp
+    ../PDFIUM/third_party/icu/source/common/usc_impl.cpp
+    ../PDFIUM/third_party/icu/source/common/uscript.cpp
+    ../PDFIUM/third_party/icu/source/common/uscript_props.cpp
+    ../PDFIUM/third_party/icu/source/common/uset.cpp
+    ../PDFIUM/third_party/icu/source/common/usetiter.cpp
+    ../PDFIUM/third_party/icu/source/common/uset_props.cpp
+    ../PDFIUM/third_party/icu/source/common/ushape.cpp
+    ../PDFIUM/third_party/icu/source/common/usprep.cpp
+    ../PDFIUM/third_party/icu/source/common/ustack.cpp
+    ../PDFIUM/third_party/icu/source/common/ustrcase.cpp
+    ../PDFIUM/third_party/icu/source/common/ustrcase_locale.cpp
+    ../PDFIUM/third_party/icu/source/common/ustr_cnv.cpp
+    ../PDFIUM/third_party/icu/source/common/ustrenum.cpp
+    ../PDFIUM/third_party/icu/source/common/ustrfmt.cpp
+    ../PDFIUM/third_party/icu/source/common/ustring.cpp
+    ../PDFIUM/third_party/icu/source/common/ustr_titlecase_brkiter.cpp
+    ../PDFIUM/third_party/icu/source/common/ustrtrns.cpp
+    ../PDFIUM/third_party/icu/source/common/ustr_wcs.cpp
+    ../PDFIUM/third_party/icu/source/common/utext.cpp
+    ../PDFIUM/third_party/icu/source/common/utf_impl.cpp
+    ../PDFIUM/third_party/icu/source/common/util.cpp
+    ../PDFIUM/third_party/icu/source/common/util_props.cpp
+    ../PDFIUM/third_party/icu/source/common/utrace.cpp
+    ../PDFIUM/third_party/icu/source/common/utrie2_builder.cpp
+    ../PDFIUM/third_party/icu/source/common/utrie2.cpp
+    ../PDFIUM/third_party/icu/source/common/utrie.cpp
+    ../PDFIUM/third_party/icu/source/common/utrie_swap.cpp
+    ../PDFIUM/third_party/icu/source/common/uts46.cpp
+    ../PDFIUM/third_party/icu/source/common/utypes.cpp
+    ../PDFIUM/third_party/icu/source/common/uvector.cpp
+    ../PDFIUM/third_party/icu/source/common/uvectr32.cpp
+    ../PDFIUM/third_party/icu/source/common/uvectr64.cpp
+    ../PDFIUM/third_party/icu/source/common/wintz.cpp
+
+    ../PDFIUM/third_party/icu/source/stubdata/stubdata.cpp
+)
+
+target_compile_options(
+    fx_icu PRIVATE
+    -O3 -Wno-shift-negative-value -Wno-unused-parameter -DU_USING_ICU_NAMESPACE=0 -DU_ENABLE_DYLOAD=0 -DUSE_CHROMIUM_ICU=1 -DU_STATIC_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DU_COMMON_IMPLEMENTATION -DU_HIDE_DATA_SYMBOL -DICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_FILE -DHAVE_DLOPEN=0 -DUCONFIG_ONLY_HTML_CONVERSION=1 -DUCONFIG_USE_WINDOWS_LCID_MAPPING_API=0 -DU_CHARSET_IS_UTF8=1 -DU_ICUDATAENTRY_IN_COMMON -DANDROID
+)
+
+add_library(pdfium SHARED
+    ../PDFIUM/fpdfsdk/cpdfsdk_actionhandler.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_annot.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_annothandlermgr.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_annotiteration.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_annotiterator.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_appstream.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_baannot.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_baannothandler.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_customaccess.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_fieldaction.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_filewriteadapter.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_formfillenvironment.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_helpers.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_interactiveform.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_pageview.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_pauseadapter.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_renderpage.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_widget.cpp
+    ../PDFIUM/fpdfsdk/cpdfsdk_widgethandler.cpp
+    ../PDFIUM/fpdfsdk/fpdf_annot.cpp
+    ../PDFIUM/fpdfsdk/fpdf_attachment.cpp
+    ../PDFIUM/fpdfsdk/fpdf_catalog.cpp
+    ../PDFIUM/fpdfsdk/fpdf_dataavail.cpp
+    ../PDFIUM/fpdfsdk/fpdf_doc.cpp
+    ../PDFIUM/fpdfsdk/fpdf_editimg.cpp
+    ../PDFIUM/fpdfsdk/fpdf_editpage.cpp
+    ../PDFIUM/fpdfsdk/fpdf_editpath.cpp
+    ../PDFIUM/fpdfsdk/fpdf_edittext.cpp
+    ../PDFIUM/fpdfsdk/fpdf_ext.cpp
+    ../PDFIUM/fpdfsdk/fpdf_flatten.cpp
+    ../PDFIUM/fpdfsdk/fpdf_formfill.cpp
+    ../PDFIUM/fpdfsdk/fpdf_javascript.cpp
+    ../PDFIUM/fpdfsdk/fpdf_ppo.cpp
+    ../PDFIUM/fpdfsdk/fpdf_progressive.cpp
+    ../PDFIUM/fpdfsdk/fpdf_save.cpp
+    ../PDFIUM/fpdfsdk/fpdf_searchex.cpp
+    ../PDFIUM/fpdfsdk/fpdf_structtree.cpp
+    ../PDFIUM/fpdfsdk/fpdf_sysfontinfo.cpp
+    ../PDFIUM/fpdfsdk/fpdf_text.cpp
+    ../PDFIUM/fpdfsdk/fpdf_thumbnail.cpp
+    ../PDFIUM/fpdfsdk/fpdf_transformpage.cpp
+    ../PDFIUM/fpdfsdk/fpdf_view.cpp
+
+    ../PDFIUM/fpdfsdk/formfiller/cffl_button.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_checkbox.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_combobox.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_formfiller.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_interactiveformfiller.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_listbox.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_pushbutton.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_radiobutton.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_textfield.cpp
+    ../PDFIUM/fpdfsdk/formfiller/cffl_textobject.cpp
+
+    ../PDFIUM/fpdfsdk/pwl/cpwl_button.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_caret.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_combo_box.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_edit.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_edit_ctrl.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_edit_impl.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_icon.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_list_box.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_list_impl.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_scroll_bar.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_special_button.cpp
+    ../PDFIUM/fpdfsdk/pwl/cpwl_wnd.cpp
+)
+
+
+add_library(pdfium-lib SHARED
+    mainJNILib.cpp
+)
+
+target_compile_options(
+    pdfium-lib PRIVATE
+    -O3 -I${SRC_HOME_PATH}
+)
+
+#=============依赖================
+
+target_link_libraries(
+    fxcodec
+    libjpeg fx_lcms2 fx_libopenjpeg fx_zlib
+)
+
+target_link_libraries(
+    fpdfapi
+    fdrm
+)
+
+target_link_libraries(
+    fxcrt
+    fx_base
+)
+
+target_link_libraries(
+    pdfium
+    fdrm
+    fpdfdoc
+    fpdfapi
+    fpdftext
+    fxcodec
+    fxcrt
+    fxge
+    fx_agg32
+    fx_freetype
+    fx_icu
+    fx_base
+)
+
+
+target_link_libraries(
+    pdfium-lib
+    pdfium android log jnigraphics
+)
