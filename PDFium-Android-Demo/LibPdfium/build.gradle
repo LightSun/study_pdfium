@@ -16,7 +16,8 @@ android {
         externalNativeBuild {
             cmake {
                 // Passes optional arguments to CMake.
-                arguments '-DANDROID_PLATFORM=android-19', '-DANDROID_TOOLCHAIN=clang'
+                //-DANDROID_ARM_NEON=TRUE resolve: 'error: "NEON support not enabled"'
+                arguments '-DANDROID_PLATFORM=android-19',"-DANDROID_ARM_NEON=TRUE", '-DANDROID_TOOLCHAIN=clang'
 
                 // Sets optional flags for the C compiler.
                 //cFlags "-D_EXAMPLE_C_FLAG1", "-D_EXAMPLE_C_FLAG2"

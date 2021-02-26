@@ -29,36 +29,89 @@ include_directories (
     #d:/Code/NVPACK/android_sdk/ndk/21.0.6113669/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include
 )
 
+SET(fx_zlib_SRC ../PDFIUM/third_party/zlib/adler32.c
+                    ../PDFIUM/third_party/zlib/compress.c
+                    ../PDFIUM/third_party/zlib/crc32.c
+                    ../PDFIUM/third_party/zlib/deflate.c
+                    ../PDFIUM/third_party/zlib/gzclose.c
+                    ../PDFIUM/third_party/zlib/gzlib.c
+                    ../PDFIUM/third_party/zlib/gzread.c
+                    ../PDFIUM/third_party/zlib/gzwrite.c
+                    ../PDFIUM/third_party/zlib/infback.c
+                    ../PDFIUM/third_party/zlib/inffast.c
+                    ../PDFIUM/third_party/zlib/inftrees.c
+                    ../PDFIUM/third_party/zlib/trees.c
+                    ../PDFIUM/third_party/zlib/uncompr.c
+                    ../PDFIUM/third_party/zlib/zutil.c
+
+                    ../PDFIUM/third_party/zlib/adler32_simd.c
+
+ #                   ../PDFIUM/third_party/zlib/arm_features.c
+                    ../PDFIUM/third_party/zlib/crc32_simd.c
+
+                    ../PDFIUM/third_party/zlib/contrib/optimizations/inffast_chunk.c
+                    ../PDFIUM/third_party/zlib/contrib/optimizations/inflate.c
+                    )
+
+if(${CMAKE_ANDROID_ARCH_ABI} STREQUAL "arm64-v8a")
+set(fx_zlib_SRC ${fx_zlib_SRC}
+             ../PDFIUM/third_party/zlib/arm_features.c
+             ../PDFIUM/third_party/zlib/crc32_simd.c
+              ../PDFIUM/third_party/zlib/simd_stub.c
+            )
+
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
+set(fx_zlib_SRC ${fx_zlib_SRC}
+             ../PDFIUM/third_party/zlib/arm_features.c
+             ../PDFIUM/third_party/zlib/crc32_simd.c
+              ../PDFIUM/third_party/zlib/simd_stub.c
+            )
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "x86")
+set(fx_zlib_SRC ${fx_zlib_SRC}
+             ../PDFIUM/third_party/zlib/x86.c
+             ../PDFIUM/third_party/zlib/crc_folding.c
+             ../PDFIUM/third_party/zlib/fill_window_sse.c
+            )
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "x86_64")
+set(fx_zlib_SRC ${fx_zlib_SRC}
+              ../PDFIUM/third_party/zlib/x86.c
+              ../PDFIUM/third_party/zlib/crc_folding.c
+              ../PDFIUM/third_party/zlib/fill_window_sse.c
+             )
+endif()
+
 add_library(fx_zlib STATIC
-    ../PDFIUM/third_party/zlib/adler32.c
-    ../PDFIUM/third_party/zlib/compress.c
-    ../PDFIUM/third_party/zlib/crc32.c
-    ../PDFIUM/third_party/zlib/deflate.c
-    ../PDFIUM/third_party/zlib/gzclose.c
-    ../PDFIUM/third_party/zlib/gzlib.c
-    ../PDFIUM/third_party/zlib/gzread.c
-    ../PDFIUM/third_party/zlib/gzwrite.c
-    ../PDFIUM/third_party/zlib/infback.c
-    ../PDFIUM/third_party/zlib/inffast.c
-    ../PDFIUM/third_party/zlib/inftrees.c
-    ../PDFIUM/third_party/zlib/trees.c
-    ../PDFIUM/third_party/zlib/uncompr.c
-    ../PDFIUM/third_party/zlib/zutil.c
-
-    ../PDFIUM/third_party/zlib/adler32_simd.c
-
-    ../PDFIUM/third_party/zlib/arm_features.c
-    ../PDFIUM/third_party/zlib/crc32_simd.c
-
-    ../PDFIUM/third_party/zlib/contrib/optimizations/inffast_chunk.c
-    ../PDFIUM/third_party/zlib/contrib/optimizations/inflate.c
-
-    ../PDFIUM/third_party/zlib/simd_stub.c
+    ${fx_zlib_SRC}
 )
+
+# INFLATE_CHUNK_SIMD_NEON:  only used for arm
+# ARMV8_OS_ANDROID:  arm64
+# INFLATE_CHUNK_SIMD_NEON
+
+SET(fx_zlib_flags -O3 -Wno-shift-negative-value -Wno-unused-parameter -msse4.2
+-I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib
+-I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib/contrib/optimizations)
+
+if(${CMAKE_ANDROID_ARCH_ABI} STREQUAL "arm64-v8a")
+
+SET(fx_zlib_flags ${fx_zlib_flags} -DARMV8_OS_ANDROID -DADLER32_SIMD_NEON -DINFLATE_CHUNK_SIMD_NEON -DINFLATE_CHUNK_READ_64LE)
+
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
+SET(fx_zlib_flags ${fx_zlib_flags} -DARMV8_OS_ANDROID -DADLER32_SIMD_NEON -DINFLATE_CHUNK_SIMD_NEON)
+
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "x86")
+SET(fx_zlib_flags ${fx_zlib_flags} -mssse3 -DADLER32_SIMD_SSSE3 -DINFLATE_CHUNK_SIMD_SSE2
+    -DCRC32_SIMD_SSE42_PCLMUL -msse4.2 -mpclmul)
+
+elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "x86_64")
+SET(fx_zlib_flags ${fx_zlib_flags} -mssse3 -DADLER32_SIMD_SSSE3 -DINFLATE_CHUNK_SIMD_SSE2
+    -DINFLATE_CHUNK_READ_64LE -DCRC32_SIMD_SSE42_PCLMUL -msse4.2 -mpclmul)
+
+endif()
 
 target_compile_options(
     fx_zlib PRIVATE
-    -O3 -I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib -I${SRC_HOME_PATH}/../PDFIUM/third_party/zlib/contrib/optimizations
+    ${fx_zlib_flags}
 )
 
 
@@ -422,13 +475,7 @@ add_library(fx_libopenjpeg STATIC
     ../PDFIUM/third_party/libopenjpeg20/thread.c
 )
 
-# INFLATE_CHUNK_SIMD_NEON:  only used for arm
-# ARMV8_OS_ANDROID:  arm64
-# INFLATE_CHUNK_SIMD_NEON
-target_compile_options(
-    fx_zlib PRIVATE
-    -O3 -Wno-shift-negative-value -Wno-unused-parameter -DADLER32_SIMD_NEON -DARMV8_OS_ANDROID -DINFLATE_CHUNK_SIMD_NEON -DINFLATE_CHUNK_READ_64LE
-)
+
 
 add_library(fx_agg32 STATIC
     ../PDFIUM/third_party/agg23/agg_curves.cpp
