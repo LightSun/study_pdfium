@@ -56,14 +56,12 @@ SET(fx_zlib_SRC ../PDFIUM/third_party/zlib/adler32.c
 if(${CMAKE_ANDROID_ARCH_ABI} STREQUAL "arm64-v8a")
 set(fx_zlib_SRC ${fx_zlib_SRC}
              ../PDFIUM/third_party/zlib/arm_features.c
-             ../PDFIUM/third_party/zlib/crc32_simd.c
               ../PDFIUM/third_party/zlib/simd_stub.c
             )
 
 elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "armeabi-v7a")
 set(fx_zlib_SRC ${fx_zlib_SRC}
              ../PDFIUM/third_party/zlib/arm_features.c
-             ../PDFIUM/third_party/zlib/crc32_simd.c
               ../PDFIUM/third_party/zlib/simd_stub.c
             )
 elseif (${CMAKE_ANDROID_ARCH_ABI} STREQUAL "x86")
