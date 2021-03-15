@@ -1178,6 +1178,7 @@ add_library(pdfium SHARED
 
 add_library(pdfium-lib SHARED
     mainJNILib.cpp
+    test_fx_bitmap.cpp
 )
 
 target_compile_options(

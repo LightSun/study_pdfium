@@ -26,7 +26,7 @@ static Mutex sLibraryLock;
 
 static int sLibraryReferenceCount = 0;
 
-static void initLibraryIfNeed(){
+extern "C" void initLibraryIfNeed(){
     Mutex::Autolock lock(sLibraryLock);
     if(sLibraryReferenceCount == 0){
         LOGD("Init FPDF library");
@@ -830,5 +830,4 @@ extern "C" JNI_FUNC(void, PdfiumCore, nInsertImage)(JNI_ARGS, jlong docPtr, jint
                                        kBitmapSize, 0, 0));
     FPDFPageObj_Transform(image_object, 1, 0, 0, 1, 200, 600);
     FPDFAnnot_AppendObject(anno, image_object);
-
 }
