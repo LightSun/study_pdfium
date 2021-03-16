@@ -24,7 +24,7 @@ android {
                 //cFlags "-D_EXAMPLE_C_FLAG1", "-D_EXAMPLE_C_FLAG2"
 
                 // Sets a flag to enable format macro constants for the C++ compiler.
-                cppFlags "-D__STDC_FORMAT_MACROS -DFT2_BUILD_LIBRARY"
+                cppFlags "-D__STDC_FORMAT_MACROS -DFT2_BUILD_LIBRARY -DANDROID"
             }
         }
     }
@@ -38,6 +38,12 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            jniDebuggable true
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

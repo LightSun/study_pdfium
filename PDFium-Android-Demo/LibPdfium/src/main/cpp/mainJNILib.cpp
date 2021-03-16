@@ -733,6 +733,11 @@ Java_com_shockwave_pdfium_PdfiumCore_nSavePdf(JNIEnv *env, jobject thiz, jlong d
     auto str = env->GetStringUTFChars(path, NULL);
     //clear and allow write
     auto pFile = fopen(str, "wb+");
+    if(pFile == nullptr){
+        jniThrowExceptionFmt(env, "java/io/IOException",
+                             "can't open file, Do you have the permission? file = %s", str);
+        return;
+    }
     DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
 
     PdfToFdWriter writer;
