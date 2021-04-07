@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.SparseBooleanArray;
 
+import com.heaven7.android.pdf.PdfAnnotManager;
 import com.knizha.PDocViewer.exception.PageRenderingException;
 import com.knizha.PDocViewer.util.FitPolicy;
 import com.knizha.PDocViewer.util.PageSizeCalculator;
@@ -74,6 +75,8 @@ class PdfFile {
      */
     private final boolean fitEachPage;
 
+    private PdfAnnotManager mAnnotM;
+
     PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize,
 			boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage) {
         this.pdfiumCore = pdfiumCore;
@@ -83,7 +86,12 @@ class PdfFile {
         this.spacingPx = spacing;
         this.autoSpacing = autoSpacing;
         this.fitEachPage = fitEachPage;
+        this.mAnnotM = new PdfAnnotManager(pdfDocument);
         setup(viewSize);
+    }
+
+    public PdfAnnotManager getPdfAnnotManager() {
+        return mAnnotM;
     }
     public void addImage(int pageIndex, Bitmap bitmap, Matrix matrix){
         pdfiumCore.addImage(pdfDocument, pageIndex, bitmap, matrix);

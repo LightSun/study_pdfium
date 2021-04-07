@@ -62,7 +62,7 @@ public class PDocMainActivity extends AppCompatActivity implements OnPageChangeL
     private final static int REQUEST_CODE = 42;
     public static final int PERMISSION_CODE = 42042;
 
-    public static final String SAMPLE_FILE = "sample.pdf";
+    public static final String SAMPLE_FILE = "gx.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 	
 	@Override
@@ -226,7 +226,10 @@ public class PDocMainActivity extends AppCompatActivity implements OnPageChangeL
         Log.e(TAG, "modDate = " + meta.getModDate());
 
         printBookmarksTree(pDocView.getTableOfContents(), "-");
-
+        pDocView.getPdfFile().getPdfAnnotManager().readAnnots();
+        if(nbPages == pDocView.getPageCount() - 1){
+            pDocView.redrawPages();
+        }
     }
 
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {

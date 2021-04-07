@@ -111,4 +111,8 @@ public class PdfDocument {
     public boolean hasPage(int index) {
         return mNativePagesPtr.containsKey(index);
     }
+
+    public long getNativePtr(){
+        return mNativeDocPtr;
+    }
 }

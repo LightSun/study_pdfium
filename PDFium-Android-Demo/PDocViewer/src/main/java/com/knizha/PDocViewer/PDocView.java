@@ -716,6 +716,10 @@ public class PDocView extends RelativeLayout {
     void redraw() {
         invalidate();
     }
+    public void redrawPages(){
+        cacheManager.recycle();
+        loadPages();
+    }
 
     /**
      * Called when a rendering task is over and

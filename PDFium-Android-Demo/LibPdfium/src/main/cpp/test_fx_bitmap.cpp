@@ -42,7 +42,10 @@ static void DrawTextString(CFX_RenderDevice* pDevice,
                                        const CPDF_RenderOptions& options) {
     if (pFont->IsType3Font())
         return;
-
+    /**
+     * 1, unicode 计算字符个数. 转化为List<uint32_t>. GetNextChar
+     * 2, GetCharWidthF
+     */
     int nChars = pFont->CountChar(str.AsStringView());
     if (nChars <= 0)
         return;
