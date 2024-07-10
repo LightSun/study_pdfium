@@ -86,32 +86,56 @@ namespace med_pdf {
             {
                 auto& str = beforeDesc->at(0);
                 auto strs = utf16Split(str, spaceStr);
-                MED_ASSERT(strs.size() == 2);
-                pi->checkNum = strings::FromUtf16(strs[0]);
-                pi->checkInNum = strings::FromUtf16(strs[1]);
+                if(strs.size() > 0){
+                    if(strs.size() < 2){
+                        pi->checkNum = strings::FromUtf16(strs[0]);
+                    }else{
+                        //MED_ASSERT(strs.size() == 2);
+                        pi->checkNum = strings::FromUtf16(strs[0]);
+                        pi->checkInNum = strings::FromUtf16(strs[1]);
+                    }
+                }
             }
             {
                 auto& str = beforeDesc->at(1);
                 auto strs = utf16Split(str, spaceStr);
-                MED_ASSERT(strs.size() == 3);
-                pi->patientName = strings::FromUtf16(strs[0]);
-                pi->gender = strings::FromUtf16(strs[1]);
-                String ageStr = strings::FromUtf16(strs[2]);
-                pi->age = std::stoi(ageStr, nullptr);
+                pi->age = 0;
+                if(strs.size() > 0){
+                    if(strs.size() >= 3){
+                        //MED_ASSERT(strs.size() == 3);
+                        pi->patientName = strings::FromUtf16(strs[0]);
+                        pi->gender = strings::FromUtf16(strs[1]);
+                        String ageStr = strings::FromUtf16(strs[2]);
+                        pi->age = std::stoi(ageStr, nullptr);
+                    }else{
+                        pi->patientName = strings::FromUtf16(strs[0]);
+                    }
+                }
             }
             {
                 auto& str = beforeDesc->at(2);
                 auto strs = utf16Split(str, spaceStr);
-                MED_ASSERT(strs.size() == 3);
-                pi->checkPart = strings::FromUtf16(strs[0]);
-                pi->checkDate = strings::FromUtf16(strs[1] + spaceStr + strs[2]);
+                if(strs.size() > 0){
+                    if(strs.size() < 3){
+                        pi->checkPart = strings::FromUtf16(strs[0]);
+                        pi->checkDate = "";
+                    }else{
+                        //MED_ASSERT(strs.size() == 3);
+                        pi->checkPart = strings::FromUtf16(strs[0]);
+                        pi->checkDate = strings::FromUtf16(strs[1] + spaceStr + strs[2]);
+                    }
+                }
             }
-            pi->UltrasoundDesc = listU16ToStr(*desc, NEW_LINE);
-            pi->UltrasoundTip = listU16ToStr(*tip, NEW_LINE);
+            pi->ultrasoundDesc = listU16ToStr(*desc, NEW_LINE);
+            pi->ultrasoundTip = listU16ToStr(*tip, NEW_LINE);
             {
-                MED_ASSERT(afterTip->size() >= 5);
-                pi->doctorName = strings::FromUtf16(afterTip->at(0));
-                pi->reportDate = strings::FromUtf16(afterTip->at(4));
+                //MED_ASSERT(afterTip->size() >= 5);
+                if(afterTip->size() > 0){
+                    pi->doctorName = strings::FromUtf16(afterTip->at(0));
+                    if(afterTip->size() >= 5){
+                        pi->reportDate = strings::FromUtf16(afterTip->at(4));
+                    }
+                }
             }
         }
     };
@@ -242,13 +266,13 @@ namespace med_pdf {
             auto textPge = FPDFText_LoadPage(page);
             int cc = FPDFText_CountChars(textPge);
             int rects = FPDFText_CountRects(textPge, 0, -1);
-            LOGI("CountChars, CountRects = %d, %d\n", cc, rects);
+            //LOGI("CountChars, CountRects = %d, %d\n", cc, rects);
             MED_ASSERT(cc > 0);
-            std::vector<char16_t> buf(cc);
+            std::vector<char16_t> buf(cc + 1);
             FPDFText_GetText(textPge, 0, cc, (unsigned short*)buf.data());
             FPDFText_ClosePage(textPge);
             //
-            auto u16Str = std::u16string(buf.data());
+            auto u16Str = std::u16string(buf.data(), cc);
             // LOGI("u16_len = %d, [unsigned short*] len = %d\n", (int)u16Str.length(), cc);
             auto text = strings::FromUtf16(u16Str);
             //LOGI("u16_len = %d, u8_len = %d\n", (int)u16Str.length(), (int)text.length());

@@ -40,8 +40,8 @@ struct PdfInfo{
     int age;
     String checkPart;
     String checkDate;
-    String UltrasoundDesc;
-    String UltrasoundTip;
+    String ultrasoundDesc;
+    String ultrasoundTip;
     String doctorName;
     String reportDate;
 };

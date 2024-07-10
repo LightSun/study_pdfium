@@ -140,8 +140,10 @@ void testBylib(){
 
     med_pdf::initLib();
     //
-    FPDF_STRING test_doc = "/home/heaven7/heaven7/work/share_folder/tmp4/siqi/Desktop/"
-                           "乳腺徐娜娜/document.pdf";
+    FPDF_STRING test_doc = "/home/heaven7/heaven7/work/share_folder/tmp4/siqi/Desktop2/"
+                           "甲状腺结节/document.pdf";
+//    FPDF_STRING test_doc = "/home/heaven7/heaven7/work/share_folder/tmp4/siqi/Desktop/"
+//                           "乳腺徐娜娜/document.pdf";
     med_pdf::PdfInfo info;
     med_pdf::readPdfInfo(test_doc, &info);
     //
